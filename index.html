@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리반 온라인 시간표</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f6f9; margin: 0; padding: 17px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; min-height: 100vh; box-sizing: border-box; }
+        .title-container, .nav-container, .badge-stack { display: flex; align-items: center; justify-content: center; }
+        .title-container { gap: 13px; margin-bottom: 17px; flex-wrap: wrap; position: relative; }
+        .badge-stack { flex-direction: column; gap: 5px; }
+        .nav-container { gap: 10px; background-color: white; padding: 5px 10px; border-radius: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .nav-btn { background-color: #4A90E2; color: white; border: none; border-radius: 50%; width: 27px; height: 27px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s; }
+        .nav-btn:hover { background-color: #357ABD; }
+        .nav-btn:active { transform: scale(0.95); }
+        h1 { color: #333; margin: 0; font-size: 20px; text-align: center; white-space: pre-line; }
+        .notice-trigger-btn, .dday-badge { padding: 5px 12px; border-radius: 17px; font-size: 15px; font-weight: bold; text-align: center; box-sizing: border-box; width: 110px; }
+        .notice-trigger-btn { background-color: #4caf50; color: white; cursor: pointer; box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3); animation: pulse-notice 2s infinite; user-select: none; }
+        @keyframes pulse-notice { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); background-color: #43a047; } }
+        .dday-badge { background-color: #ff5252; color: white; box-shadow: 0 2px 4px rgba(255, 82, 82, 0.3); }
+        .table-wrapper { width: 100%; max-width: 935px; overflow-x: auto; background-color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 7px; -webkit-overflow-scrolling: touch; transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
+        .table-wrapper.slide-left { transform: translateX(-85px); opacity: 0; }
+        .table-wrapper.slide-right { transform: translateX(85px); opacity: 0; }
+        table { border-collapse: collapse; width: 100%; min-width: 765px; text-align: center; table-layout: fixed; }
+        th { background-color: #4A90E2; color: white; padding: 13px 4px; font-size: 13px; }
+        th:nth-child(1) { width: 10%; }
+        th:nth-child(n+2):nth-child(-n+8) { width: 12.85%; }
+        th.weekend-header { background-color: #5c6bc0; }
+        td { padding: 13px 7px; border-bottom: 1px solid #eeeeee; border-right: 1px solid #eeeeee; font-size: 12px; color: #555; vertical-align: top; word-break: keep-all; overflow: hidden; }
+        td:first-child { background-color: #f9f9f9; font-weight: bold; color: #333; vertical-align: middle; }
+        .subject-cell { cursor: pointer; }
+        .subject-cell:hover { background-color: #eaf2fc !important; }
+        .subject-name { display: block; }
+        .details { max-height: 0; opacity: 0; overflow: hidden; font-size: 10px; color: #666; text-align: left; padding-left: 4px; transition: max-height 0.3s ease-in-out, opacity 0.2s, margin-top 0.3s; }
+        .subject-cell.active { background-color: #f6faff !important; }
+        .subject-cell.active .subject-name { font-weight: bold; color: #4A90E2; }
+        .subject-cell.active .details { max-height: 170px; opacity: 1; margin-top: 8px; border-top: 1px dashed #dddddd; padding-top: 7px; }
+        .subject-cell.has-assignment { background-color: #eefbee; border: 1px solid #c2ecc2; }
+        .subject-cell.has-assignment:hover { background-color: #dcf7dc !important; }
+        .subject-cell.has-assignment .subject-name { color: #2e7d32; font-weight: bold; }
+        .subject-cell.has-assignment.active { background-color: #f3fcf3 !important; }
+        .subject-cell.has-image-popup { background-color: #f0f4ff; border: 1px solid #cedcfc; }
+        .subject-cell.has-image-popup:hover { background-color: #e1e9ff !important; }
+        .subject-cell.has-image-popup .subject-name { color: #1a4fc0; font-weight: bold; }
+        .weekend-cell, .next-week-cell, .deadline-cell { text-align: left; line-height: 1.6; }
+        .weekend-cell { vertical-align: top !important; background-color: #fcfcfd; font-size: 11px; color: #333; }
+        .next-week-cell { background-color: #fffde7; border-top: 1px solid #ffe082; color: #333; vertical-align: top !important; padding: 13px; }
+        .next-week-title { font-weight: bold; display: block; margin-bottom: 5px; font-size: 11px; color: #e65100; }
+        .next-week-content { font-size: 11px; color: #444; }
+        .deadline-row-title { background-color: #fce4ec !important; color: #c2185b !important; font-weight: bold; vertical-align: middle !important; }
+        .deadline-cell { background-color: #fff8fa; font-size: 10px; color: #880e4f; padding: 10px 7px; }
+        .no-school-cell { background-color: #ffebee !important; color: #d32f2f !important; font-weight: bold; vertical-align: middle !important; }
+        .guide-wrapper { width: 100%; max-width: 935px; margin-top: 15px; display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 60px; }
+        .guide-toggle-btn { background-color: #fff; border: 1px solid #ddd; color: #666; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 15px; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: background 0.15s, color 0.15s; }
+        .guide-toggle-btn:hover { background-color: #f0f4f9; color: #4A90E2; border-color: #4A90E2; }
+        .info-container { width: 100%; max-height: 0; opacity: 0; overflow: hidden; box-sizing: border-box; text-align: left; transition: max-height 0.25s ease-out, opacity 0.2s, margin-top 0.25s; }
+        .info-container.show { max-height: 180px; opacity: 1; margin-top: 8px; padding: 4px 10px; }
+        .info-text { font-size: 10px; color: #777; margin: 3px 0; word-break: keep-all; }
+        .version-tag { font-size: 13px; color: #888; font-weight: bold; letter-spacing: 0.5px; margin-top: auto; padding-bottom: 10px; user-select: none; }
+        .credit-container { position: fixed; bottom: 12px; right: 15px; display: flex; flex-direction: column; align-items: flex-end; z-index: 999; }
+        .credit-box { background-color: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 6px; text-align: right; opacity: 0; pointer-events: none; transform: translateY(5px); transition: opacity 0.2s, transform 0.2s; }
+        .credit-box.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .credit-name { font-size: 10px; color: #555; font-weight: bold; margin: 2px 0; line-height: 1.2; }
+        .credit-trigger { font-size: 11px; color: #aaa; cursor: pointer; transition: color 0.2s; font-weight: bold; user-select: none; }
+        .credit-trigger:hover { color: #4A90E2; }
+        
+        .image-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 2000; }
+        .image-modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .image-modal-content { background-color: transparent; padding: 0; max-width: 95%; max-height: 95vh; display: flex; flex-direction: column; align-items: center; transform: scale(0.95); transition: transform 0.2s; }
+        .image-modal-overlay.show .image-modal-content { transform: scale(1); }
+        .image-modal-img { max-width: 100%; max-height: 95vh; object-fit: contain; border-radius: 6px; }
+
+        #main-page { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        #notice-page { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 935px; animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-back-btn { background-color: #fff; border: 1px solid #ddd; color: #555; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; margin-bottom: 15px; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
+        .page-back-btn:hover { background-color: #f0f2f5; color: #4A90E2; border-color: #4A90E2; }
+        
+        .notice-scroll-box {
+            width: 100%;
+            height: 82vh; 
+            overflow-y: auto; 
+            background-color: #fff;
+            border: 1px solid #e3e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            box-sizing: border-box;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.03); 
+        }
+        .notice-scroll-box::-webkit-scrollbar { width: 6px; }
+        .notice-scroll-box::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+        .notice-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; box-sizing: border-box; }
+
+        .grid-card { 
+            background-color: white; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            height: 320px; 
+            cursor: pointer; 
+            overflow: hidden; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            position: relative; 
+        }
+        .grid-card img { width: 100%; height: 100%; object-fit: cover; }
+        .grid-card:hover { transform: translateY(-4px); box-shadow: 0 5px 12px rgba(0,0,0,0.1); border-color: #4A90E2; }
+
+        .grid-caption {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9); 
+            color: #222;
+            font-size: 12px; 
+            font-weight: bold;
+            padding: 7px 0;
+            text-align: center;
+            border-bottom: 1px solid #edf2f7;
+            box-sizing: border-box;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            .notice-scroll-box { height: 80vh; padding: 10px; } 
+            .grid-card { height: 210px; } 
+            .grid-caption { font-size: 10px; padding: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-page">
+        <div class="title-container">
+            <div class="nav-container">
+                <button class="nav-btn" id="prev-btn">◀</button>
+                <h1 id="timetable-title">?? 2-4 시간표</h1>
+                <button class="nav-btn" id="next-btn">▶</button>
+            </div>
+            <div class="badge-stack">
+                <div class="notice-trigger-btn" id="notice-btn">통신문</div>
+                <span id="dday-display" class="dday-badge">D-Day</span>
+            </div>
+        </div>
+
+        <div class="table-wrapper" id="table-wrapper">
+            <table id="timetable">
+                <thead>
+                    <tr>
+                        <th>교시</th><th id="th-월">월</th><th id="th-화">화</th><th id="th-수">수</th><th id="th-목">목</th><th id="th-금">금</th><th id="th-토" class="weekend-header">토</th><th id="th-일" class="weekend-header">일</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="guide-wrapper">
+            <button class="guide-toggle-btn" id="guide-toggle-btn">안내 수칙 가이드 <span id="arrow-icon">▼</span></button>
+            <div class="info-container" id="info-container">
+                <p class="info-text">?? 1. 과제가 있는 교과는 <strong>초록색</strong>으로 표시되며, 클릭 시 과제가 표시됩니다.</p>
+                <p class="info-text">?? 2. 시험 기간에는 <strong>매주 일요일</strong>, 수행평가 기간에는 <strong>매일</strong> 업데이트될 예정입니다.</p>
+                <p class="info-text">?? 3. 제출마감 칸은 <strong>구글 클래스룸</strong> 과제의 마감일을 표시합니다.</p>
+                <p class="info-text">?? 4. <strong>D-Day</strong>는 실시간으로 변경됩니다.</p>
+                <p class="info-text">?? 5. 잘못되었거나 빠진 부분이 있을 수 있습니다. <strong>제보해 주시면 감사하겠습니다.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="notice-page">
+        <button class="page-back-btn" id="page-back-btn">◀ 시간표로 돌아가기</button>
+        <div class="notice-scroll-box">
+            <div class="notice-grid-container" id="notice-grid-container"></div>
+        </div>
+    </div>
+
+    <div class="version-tag">beta 1.1</div>
+
+    <div class="credit-container">
+        <div class="credit-box" id="credit-box"><p class="credit-name">김재원</p><p class="credit-name">한석민</p></div>
+        <div class="credit-trigger" id="credit-btn">Credit by</div>
+    </div>
+
+    <div class="image-modal-overlay" id="image-modal">
+        <div class="image-modal-content">
+            <img class="image-modal-img" id="modal-target-img" src="history_sheet.png" alt="전체화면 확대">
+        </div>
+    </div>
+
+    <script>
+        // ?? 1주차 및 2주차 주말(토/일) 할 일 데이터 완벽 세팅 완료
+        const weeksData = [
+            {
+                year: 2026, startDate: "06-01", weeklyDate: "6.01 ~ 6.07",
+                timetableData: [
+                    ['1교시', '월', '대수 (박주희)', ''], ['1교시', '화', '일본어 (박선영)', ''], ['1교시', '수', '지방선거일 ???', '휴무'], ['1교시', '목', '학년평가 ??', '학평 휴무'], ['1교시', '금', 'C', ''],
+                    ['2교시', '월', 'C', ''], ['2교시', '화', '문학 (김도연)', '비평문 발표'], ['2교시', '수', '지방선거일 ???', '휴무'], ['2교시', '목', '학년평가 ??', '학평 휴무'], ['2교시', '금', '대수 (박주희)', ''],
+                    ['3교시', '월', '영어I (배명회)', ''], ['3교시', '화', '스문 (김문헌)', ''], ['3교시', '수', '지방선거일 ???', '휴무'], ['3교시', '목', '학년평가 ??', '학평 휴무'], ['3교시', '금', '한국I (임현우)', ''], 
+                    ['4교시', '월', 'B', ''], ['4교시', '화', '대수 (신난영)', ''], ['4교시', '수', '지방선거일 ???', '휴무'], ['4교시', '목', '학년평가 ??', '학평 휴무'], ['4교시', '금', 'A', ''],
+                    ['5교시', '월', '일본어 (박영선)', '일본어 프린트 검사'], ['5교시', '화', 'A', ''], ['5교시', '수', '지방선거일 ???', '휴무'], ['5교시', '목', '학년평가 ??', '학평 휴무'], ['5교시', '금', '영어I (신은주)', ''],
+                    ['6교시', '월', '한국I (신은호)', ''], ['6교시', '화', '영어I (배명회)', ''], ['6교시', '수', '지방선거일 ???', '휴무'], ['6교시', '목', '학년평가 ??', '학평 휴무'], ['6교시', '금', 'B', ''],
+                    ['7교시', '월', '', ''], ['7교시', '화', 'C', ''], ['7교시', '수', '지방선거일 ???', '휴무'], ['7교시', '목', '학년평가 ??', '학평 휴무'], ['7교시', '금', '문학 (노지영)', '유충렬 영상 + 문제 다 풀기'], 
+                    ['마감과제', '목', '?대수 8-10 프린트 제출'],
+                    ['주말', '토', '? 열품타 6시간 이상 하기!', ''], ['주말', '일', '? 열품타 6시간 이상 하기!', '']
+                ]
+            },
+            {
+                year: 2026, startDate: "06-08", weeklyDate: "6.08 ~ 6.14",
+                timetableData: [
+                    ['1교시', '월', '대수 (박주희)', ''], ['1교시', '화', '일본어 (박선영)', ''], ['1교시', '수', '문학 (김도연)', ''], ['1교시', '목', '영어I (신은주)', ''], ['1교시', '금', 'C', ''],
+                    ['2교시', '월', 'C', ''], ['2교시', '화', '문학 (김도연)', ''], ['2교시', '수', 'B', ''], ['2교시', '목', '문학 (노지영)', ''], ['2교시', '금', '대수 (박주희)', ''],
+                    ['3교시', '월', '영어I (배명회)', ''], ['3교시', '화', '스문 (김문헌)', ''], ['3교시', '수', '스문 (서승우)', ''], ['3교시', '목', 'A', ''], ['3교시', '금', '한국I (임현우)', 'POPUP:인물 탐구 수행평가'], 
+                    ['4교시', '월', 'B', ''], ['4교시', '화', '대수 (신난영)', ''], ['4교시', '수', '한국I (신은호)', ''], ['4교시', '목', '대수 (신난영)', ''], ['4교시', '금', 'A', ''],
+                    ['5교시', '월', '일본어 (박영선)', ''], ['5교시', '화', 'A', ''], ['5교시', '수', 'A', ''], ['5교시', '목', 'B', ''], ['5교시', '금', '영어I (신은주)', ''],
+                    ['6교시', '월', '한국I (신은호)', ''], ['6교시', '화', '영어I (배명회)', ''], ['6교시', '수', '', ''], ['6교시', '목', 'C', ''], ['6교시', '금', 'B', ''],
+                    ['7교시', '월', '', ''], ['7교시', '화', 'C', ''], ['7교시', '수', '', ''], ['7교시', '목', '일본어 (박영선)', ''], ['7교시', '금', '문학 (노지영)', ''],
+                    ['주말', '토', '? 열품타 6시간 반 이상 하기!', ''], ['주말', '일', '? 열품타 6시간 반 이상 하기!', '']
+                ]
+            }
+        ];
+
+        const targetDateStr = "2026-07-02"; let currentWeekIndex = 0;
+        function calculateDDay(t) {
+            const today = new Date(); today.setHours(0,0,0,0); const target = new Date(t); target.setHours(0,0,0,0);
+            const diff = Math.ceil((target - today) / 864e5); const el = document.getElementById('dday-display');
+            if (diff > 0) { el.innerText = `기말 D-${diff}`; el.style.backgroundColor = "#ff5252"; } 
+            else if (diff === 0) { el.innerText = `?? D-Day`; el.style.backgroundColor = "#e65100"; } 
+            else { el.innerText = `완료 ??`; el.style.backgroundColor = "#4caf50"; }
+        }
+
+        const dayToIndex = { '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 7 };
+        const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+        const periods = ['1교시', '2교시', '3교시', '4교시', '점심시간', '5교시', '6교시', '7교시', '마감과제'];
+        const tbody = document.querySelector('#timetable tbody'), wrapper = document.getElementById('table-wrapper');
+
+        function renderTimetable(idx) {
+            tbody.innerHTML = ''; const cw = weeksData[idx];
+            document.getElementById('timetable-title').innerText = `?? 2-4 시간표\n(${cw.weeklyDate})`;
+            const start = new Date(`${cw.year}-${cw.startDate}T00:00:00`);
+            dayNames.forEach((d, o) => { const dd = new Date(start); dd.setDate(dd.getDate() + o); document.getElementById(`th-${d}`).innerText = `${d}(${dd.getDate()})`; });
+
+            periods.forEach((p, i) => {
+                const tr = document.createElement('tr');
+                if (p === '점심시간') tr.innerHTML = `<td colspan="6" style="background-color:#eef2f7;font-weight:bold;color:#777;vertical-align:middle;">점심 시간 ??</td>`;
+                else if (p === '마감과제') { tr.innerHTML = `<td class="deadline-row-title">제출마감</td>${dayNames.map(d => `<td class="deadline-cell" id="deadline-${d}"></td>`).join('')}`; }
+                else {
+                    tr.setAttribute('data-period', p); tr.innerHTML = `<td>${p}</td>${'<td></td>'.repeat(5)}`;
+                    if (i === 0) tr.innerHTML += `<td rowspan="4" class="weekend-cell" id="cell-토"></td><td rowspan="4" class="weekend-cell" id="cell-일"></td>`;
+                    if (p === '5교시') { const ntd = document.createElement('td'); Object.assign(ntd, { rowSpan: 4, colSpan: 2, className: 'next-week-cell', id: 'cell-다음주' }); tbody.lastChild.appendChild(ntd); }
+                }
+                tbody.appendChild(tr);
+            });
+
+            cw.timetableData.forEach(([p, d, s, a]) => {
+                let c; if (p === '마감과제') c = document.getElementById(`deadline-${d}`);
+                else if (p === '다음주과제') c = document.getElementById('cell-다음주');
+                else if (p === '주말') c = document.getElementById(`cell-${d}`);
+                else { const r = document.querySelector(`tr[data-period="${p}"]`); if (r) c = r.cells[dayToIndex[d]]; }
+                if (!c) return;
+                if (p === '마감과제') c.innerHTML = s?.trim() ? s.replace(/\n/g, '<br>') : `<span style="color:#bbb;font-size:10px;">마감 없음</span>`;
+                else if (p === '다음주과제') c.innerHTML = `<span class="next-week-title">?? 다음 주 과제</span><div class="next-week-content">${s ? s.replace(/\n/g, '<br>') : '과제 없음'}</div>`;
+                else if (p === '주말') c.innerHTML = s?.trim() ? s.replace(/\n/g, '<br>') : '';
+                else {
+                    if (!s.trim()) return; if (s.includes('지방선거일') || s.includes('학년평가')) { c.className = 'no-school-cell'; c.innerHTML = `<span>${s}</span>`; return; }
+                    if (a?.startsWith('POPUP:')) { c.classList.add('subject-cell', 'has-image-popup'); c.innerHTML = `<span class="subject-name">${s}</span>`; return; }
+                    if (a?.trim()) { c.classList.add('subject-cell', 'has-assignment'); c.innerHTML = `<span class="subject-name">${s}</span><div class="details">${a.replace(/\n/g, '<br>')}</div>`; } 
+                    else c.innerHTML = `<span class="subject-name">${s}</span>`;
+                }
+            });
+        }
+
+        function ani(dir, ti) {
+            wrapper.classList.add(dir === 'next' ? 'slide-left' : 'slide-right');
+            setTimeout(() => { currentWeekIndex = ti; renderTimetable(ti); wrapper.className = 'table-wrapper ' + (dir === 'next' ? 'slide-right' : 'slide-left'); setTimeout(() => wrapper.className = 'table-wrapper', 20); }, 150);
+        }
+        document.getElementById('prev-btn').onclick = () => currentWeekIndex > 0 ? ani('prev', currentWeekIndex - 1) : alert("첫 번째 주차입니다.");
+        document.getElementById('next-btn').onclick = () => currentWeekIndex < weeksData.length - 1 ? ani('next', currentWeekIndex + 1) : alert("마지막 등록된 주차입니다.");
+
+        const im = document.getElementById('image-modal');
+        const modalTargetImg = document.getElementById('modal-target-img');
+        
+        tbody.onclick = e => { 
+            const c = e.target.closest('.subject-cell'); 
+            if (c && c.classList.contains('has-image-popup')) {
+                modalTargetImg.src = "history_sheet.png"; 
+                im.classList.add('show');
+            } else if (c) {
+                c.classList.toggle('active');
+            }
+        };
+        im.onclick = () => im.classList.remove('show');
+
+        const mainPage = document.getElementById('main-page');
+        const noticePage = document.getElementById('notice-page');
+        const gridContainer = document.getElementById('notice-grid-container');
+
+        const noticesData = [
+            { src: "notice1.png", label: "학사일정" },
+            { src: "notice2.png", label: "영어 단어 수행평가" },
+            { src: "notice3.png", label: "통신문 3" },
+            { src: "notice4.png", label: "통신문 4" },
+            { src: "notice5.png", label: "통신문 5" },
+            { src: "notice6.png", label: "통신문 6" },
+            { src: "notice7.png", label: "통신문 7" },
+            { src: "notice8.png", label: "통신문 8" },
+            { src: "notice9.png", label: "통신문 9" },
+            { src: "notice10.png", label: "통신문 10" },
+            { src: "notice11.png", label: "통신문 11" },
+            { src: "notice12.png", label: "통신문 12" }
+        ];
+
+        function buildNoticeGrid() {
+            gridContainer.innerHTML = '';
+            noticesData.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'grid-card';
+                card.innerHTML = `
+                    <div class="grid-caption">${item.label}</div>
+                    <img src="${item.src}" alt="${item.label}">
+                `;
+                card.onclick = () => {
+                    modalTargetImg.src = item.src;
+                    im.classList.add('show');
+                };
+                gridContainer.appendChild(card);
+            });
+        }
+
+        document.getElementById('notice-btn').onclick = () => {
+            mainPage.style.display = 'none';
+            noticePage.style.display = 'flex';
+            buildNoticeGrid();
+        };
+
+        document.getElementById('page-back-btn').onclick = () => {
+            noticePage.style.display = 'none';
+            mainPage.style.display = 'flex';
+        };
+
+        const cb = document.getElementById('credit-box'); document.getElementById('credit-btn').onclick = e => { e.stopPropagation(); cb.classList.toggle('show'); };
+        document.onclick = () => cb.classList.remove('show');
+        const ic = document.getElementById('info-container'), ai = document.getElementById('arrow-icon');
+        document.getElementById('guide-toggle-btn').onclick = () => ai.innerText = ic.classList.toggle('show') ? '▲' : '▼';
+
+        calculateDDay(targetDateStr); renderTimetable(0);
+    </script>
+</body>
+</html>
