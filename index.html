@@ -139,7 +139,7 @@
         <div class="title-container">
             <div class="nav-container">
                 <button class="nav-btn" id="prev-btn">◀</button>
-                <h1 id="timetable-title">?? 2-4 시간표</h1>
+                <h1 id="timetable-title"> 2-4 시간표</h1>
                 <button class="nav-btn" id="next-btn">▶</button>
             </div>
             <div class="badge-stack">
@@ -162,11 +162,11 @@
         <div class="guide-wrapper">
             <button class="guide-toggle-btn" id="guide-toggle-btn">안내 수칙 가이드 <span id="arrow-icon">▼</span></button>
             <div class="info-container" id="info-container">
-                <p class="info-text">?? 1. 과제가 있는 교과는 <strong>초록색</strong>으로 표시되며, 클릭 시 과제가 표시됩니다.</p>
-                <p class="info-text">?? 2. 시험 기간에는 <strong>매주 일요일</strong>, 수행평가 기간에는 <strong>매일</strong> 업데이트될 예정입니다.</p>
-                <p class="info-text">?? 3. 제출마감 칸은 <strong>구글 클래스룸</strong> 과제의 마감일을 표시합니다.</p>
-                <p class="info-text">?? 4. <strong>D-Day</strong>는 실시간으로 변경됩니다.</p>
-                <p class="info-text">?? 5. 잘못되었거나 빠진 부분이 있을 수 있습니다. <strong>제보해 주시면 감사하겠습니다.</strong></p>
+                <p class="info-text"> 1. 과제가 있는 교과는 <strong>초록색</strong>으로 표시되며, 클릭 시 과제가 표시됩니다.</p>
+                <p class="info-text"> 2. 시험 기간에는 <strong>매주 일요일</strong>, 수행평가 기간에는 <strong>매일</strong> 업데이트될 예정입니다.</p>
+                <p class="info-text"> 3. 제출마감 칸은 <strong>구글 클래스룸</strong> 과제의 마감일을 표시합니다.</p>
+                <p class="info-text"> 4. <strong>D-Day</strong>는 실시간으로 변경됩니다.</p>
+                <p class="info-text"> 5. 잘못되었거나 빠진 부분이 있을 수 있습니다. <strong>제보해 주시면 감사하겠습니다.</strong></p>
             </div>
         </div>
     </div>
@@ -192,18 +192,18 @@
     </div>
 
     <script>
-        // ?? 1주차 및 2주차 주말(토/일) 할 일 데이터 완벽 세팅 완료
+        //  1주차 및 2주차 주말(토/일) 할 일 데이터 완벽 세팅 완료
         const weeksData = [
             {
                 year: 2026, startDate: "06-01", weeklyDate: "6.01 ~ 6.07",
                 timetableData: [
-                    ['1교시', '월', '대수 (박주희)', ''], ['1교시', '화', '일본어 (박선영)', ''], ['1교시', '수', '지방선거일 ???', '휴무'], ['1교시', '목', '학년평가 ??', '학평 휴무'], ['1교시', '금', 'C', ''],
-                    ['2교시', '월', 'C', ''], ['2교시', '화', '문학 (김도연)', '비평문 발표'], ['2교시', '수', '지방선거일 ???', '휴무'], ['2교시', '목', '학년평가 ??', '학평 휴무'], ['2교시', '금', '대수 (박주희)', ''],
-                    ['3교시', '월', '영어I (배명회)', ''], ['3교시', '화', '스문 (김문헌)', ''], ['3교시', '수', '지방선거일 ???', '휴무'], ['3교시', '목', '학년평가 ??', '학평 휴무'], ['3교시', '금', '한국I (임현우)', ''], 
-                    ['4교시', '월', 'B', ''], ['4교시', '화', '대수 (신난영)', ''], ['4교시', '수', '지방선거일 ???', '휴무'], ['4교시', '목', '학년평가 ??', '학평 휴무'], ['4교시', '금', 'A', ''],
-                    ['5교시', '월', '일본어 (박영선)', '일본어 프린트 검사'], ['5교시', '화', 'A', ''], ['5교시', '수', '지방선거일 ???', '휴무'], ['5교시', '목', '학년평가 ??', '학평 휴무'], ['5교시', '금', '영어I (신은주)', ''],
-                    ['6교시', '월', '한국I (신은호)', ''], ['6교시', '화', '영어I (배명회)', ''], ['6교시', '수', '지방선거일 ???', '휴무'], ['6교시', '목', '학년평가 ??', '학평 휴무'], ['6교시', '금', 'B', ''],
-                    ['7교시', '월', '', ''], ['7교시', '화', 'C', ''], ['7교시', '수', '지방선거일 ???', '휴무'], ['7교시', '목', '학년평가 ??', '학평 휴무'], ['7교시', '금', '문학 (노지영)', '유충렬 영상 + 문제 다 풀기'], 
+                    ['1교시', '월', '대수 (박주희)', ''], ['1교시', '화', '일본어 (박선영)', ''], ['1교시', '수', '지방선거일 ', '휴무'], ['1교시', '목', '학년평가 ', '학평 휴무'], ['1교시', '금', 'C', ''],
+                    ['2교시', '월', 'C', ''], ['2교시', '화', '문학 (김도연)', '비평문 발표'], ['2교시', '수', '지방선거일 ', '휴무'], ['2교시', '목', '학년평가 ', '학평 휴무'], ['2교시', '금', '대수 (박주희)', ''],
+                    ['3교시', '월', '영어I (배명회)', ''], ['3교시', '화', '스문 (김문헌)', ''], ['3교시', '수', '지방선거일 ', '휴무'], ['3교시', '목', '학년평가 ', '학평 휴무'], ['3교시', '금', '한국I (임현우)', ''], 
+                    ['4교시', '월', 'B', ''], ['4교시', '화', '대수 (신난영)', ''], ['4교시', '수', '지방선거일 ', '휴무'], ['4교시', '목', '학년평가 ', '학평 휴무'], ['4교시', '금', 'A', ''],
+                    ['5교시', '월', '일본어 (박영선)', '일본어 프린트 검사'], ['5교시', '화', 'A', ''], ['5교시', '수', '지방선거일 ', '휴무'], ['5교시', '목', '학년평가 ', '학평 휴무'], ['5교시', '금', '영어I (신은주)', ''],
+                    ['6교시', '월', '한국I (신은호)', ''], ['6교시', '화', '영어I (배명회)', ''], ['6교시', '수', '지방선거일 ', '휴무'], ['6교시', '목', '학년평가 ', '학평 휴무'], ['6교시', '금', 'B', ''],
+                    ['7교시', '월', '', ''], ['7교시', '화', 'C', ''], ['7교시', '수', '지방선거일 ', '휴무'], ['7교시', '목', '학년평가 ', '학평 휴무'], ['7교시', '금', '문학 (노지영)', '유충렬 영상 + 문제 다 풀기'], 
                     ['마감과제', '목', '?대수 8-10 프린트 제출'],
                     ['주말', '토', '? 열품타 6시간 이상 하기!', ''], ['주말', '일', '? 열품타 6시간 이상 하기!', '']
                 ]
@@ -228,8 +228,8 @@
             const today = new Date(); today.setHours(0,0,0,0); const target = new Date(t); target.setHours(0,0,0,0);
             const diff = Math.ceil((target - today) / 864e5); const el = document.getElementById('dday-display');
             if (diff > 0) { el.innerText = `기말 D-${diff}`; el.style.backgroundColor = "#ff5252"; } 
-            else if (diff === 0) { el.innerText = `?? D-Day`; el.style.backgroundColor = "#e65100"; } 
-            else { el.innerText = `완료 ??`; el.style.backgroundColor = "#4caf50"; }
+            else if (diff === 0) { el.innerText = ` D-Day`; el.style.backgroundColor = "#e65100"; } 
+            else { el.innerText = `완료 `; el.style.backgroundColor = "#4caf50"; }
         }
 
         const dayToIndex = { '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 7 };
@@ -239,13 +239,13 @@
 
         function renderTimetable(idx) {
             tbody.innerHTML = ''; const cw = weeksData[idx];
-            document.getElementById('timetable-title').innerText = `?? 2-4 시간표\n(${cw.weeklyDate})`;
+            document.getElementById('timetable-title').innerText = ` 2-4 시간표\n(${cw.weeklyDate})`;
             const start = new Date(`${cw.year}-${cw.startDate}T00:00:00`);
             dayNames.forEach((d, o) => { const dd = new Date(start); dd.setDate(dd.getDate() + o); document.getElementById(`th-${d}`).innerText = `${d}(${dd.getDate()})`; });
 
             periods.forEach((p, i) => {
                 const tr = document.createElement('tr');
-                if (p === '점심시간') tr.innerHTML = `<td colspan="6" style="background-color:#eef2f7;font-weight:bold;color:#777;vertical-align:middle;">점심 시간 ??</td>`;
+                if (p === '점심시간') tr.innerHTML = `<td colspan="6" style="background-color:#eef2f7;font-weight:bold;color:#777;vertical-align:middle;">점심 시간 </td>`;
                 else if (p === '마감과제') { tr.innerHTML = `<td class="deadline-row-title">제출마감</td>${dayNames.map(d => `<td class="deadline-cell" id="deadline-${d}"></td>`).join('')}`; }
                 else {
                     tr.setAttribute('data-period', p); tr.innerHTML = `<td>${p}</td>${'<td></td>'.repeat(5)}`;
@@ -262,7 +262,7 @@
                 else { const r = document.querySelector(`tr[data-period="${p}"]`); if (r) c = r.cells[dayToIndex[d]]; }
                 if (!c) return;
                 if (p === '마감과제') c.innerHTML = s?.trim() ? s.replace(/\n/g, '<br>') : `<span style="color:#bbb;font-size:10px;">마감 없음</span>`;
-                else if (p === '다음주과제') c.innerHTML = `<span class="next-week-title">?? 다음 주 과제</span><div class="next-week-content">${s ? s.replace(/\n/g, '<br>') : '과제 없음'}</div>`;
+                else if (p === '다음주과제') c.innerHTML = `<span class="next-week-title"> 다음 주 과제</span><div class="next-week-content">${s ? s.replace(/\n/g, '<br>') : '과제 없음'}</div>`;
                 else if (p === '주말') c.innerHTML = s?.trim() ? s.replace(/\n/g, '<br>') : '';
                 else {
                     if (!s.trim()) return; if (s.includes('지방선거일') || s.includes('학년평가')) { c.className = 'no-school-cell'; c.innerHTML = `<span>${s}</span>`; return; }
